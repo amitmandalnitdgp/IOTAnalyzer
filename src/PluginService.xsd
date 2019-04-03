@@ -1,0 +1,907 @@
+<?xml version='1.0' encoding='UTF-8'?><wsdl:definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://service.server.web.julia.juliasoft.com/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:ns2="http://schemas.xmlsoap.org/soap/http" xmlns:ns1="http://jaxb.dev.java.net/array" name="PluginService" targetNamespace="http://service.server.web.julia.juliasoft.com/">
+  <wsdl:types>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://service.server.web.julia.juliasoft.com/" attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://service.server.web.julia.juliasoft.com/">
+  <xs:element name="analysisProgress" type="tns:analysisProgress"/>
+  <xs:element name="analysisReportResult" type="tns:analysisReportResult"/>
+  <xs:element name="analysisResult" type="tns:analysisResult"/>
+  <xs:element name="analysisSpecification" type="tns:analysisSpecification"/>
+  <xs:element name="projectMetrics" type="tns:projectMetrics"/>
+  <xs:complexType name="juliaWSExceptionBean">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="businessMessage" type="xs:string"/>
+      <xs:element minOccurs="0" name="message" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="analysisExtendedStatus">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="progress" type="tns:analysisProgress"/>
+      <xs:element minOccurs="0" name="status" type="tns:analysisStatus"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="analysisProgress">
+    <xs:sequence>
+      <xs:element name="analysisId" type="xs:string"/>
+      <xs:element minOccurs="0" name="description" type="xs:string"/>
+      <xs:element name="level" type="tns:level"/>
+      <xs:element name="queuePosition" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="analysisSpecification">
+    <xs:complexContent>
+      <xs:extension base="tns:analysisSpecificationBase">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="packages">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element maxOccurs="unbounded" minOccurs="0" name="package" type="tns:analysisPackage"/>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" name="options" type="tns:options"/>
+          <xs:element minOccurs="0" name="checkers">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element maxOccurs="unbounded" name="checker" type="tns:checker"/>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="analysisSpecificationBase">
+    <xs:sequence>
+      <xs:element name="id" type="xs:string"/>
+      <xs:element minOccurs="0" name="customName" type="xs:string"/>
+      <xs:element minOccurs="0" name="description" type="xs:string"/>
+      <xs:element name="solutionId" type="xs:int"/>
+      <xs:element name="creationTimestamp" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="specificationSource" type="xs:string"/>
+      <xs:element minOccurs="0" name="specificationProducer" type="xs:string"/>
+      <xs:element minOccurs="0" name="configurationName" type="xs:string"/>
+      <xs:element name="sourceProjects" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="analysisPackage">
+    <xs:complexContent>
+      <xs:extension base="tns:artifact">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="moduleName" type="xs:string"/>
+          <xs:element minOccurs="0" name="packageMetrics" type="tns:projectMetrics"/>
+          <xs:element name="type" type="tns:packageType"/>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="relatedArtifact" type="tns:artifact"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="artifact">
+    <xs:sequence>
+      <xs:element name="key" type="xs:string"/>
+      <xs:element minOccurs="0" name="logicalType" type="xs:string"/>
+      <xs:element minOccurs="0" name="hash" type="xs:string"/>
+      <xs:element minOccurs="0" name="originatingPath" type="xs:string"/>
+      <xs:element minOccurs="0" name="description" type="xs:string"/>
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:ID" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="projectMetrics">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="projectName" type="xs:string"/>
+      <xs:element name="classCount" type="xs:int"/>
+      <xs:element name="sourceCount" type="xs:int"/>
+      <xs:element name="methodCount" type="xs:int"/>
+      <xs:element name="fieldCount" type="xs:int"/>
+      <xs:element name="constPoolEntryCount" type="xs:int"/>
+      <xs:element name="byteCodeSize" type="xs:int"/>
+      <xs:element name="statementCount" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="options">
+    <xs:complexContent>
+      <xs:extension base="tns:optionable">
+        <xs:sequence/>
+        <xs:attribute name="name" type="xs:string"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType abstract="true" name="optionable">
+    <xs:sequence>
+      <xs:choice maxOccurs="unbounded" minOccurs="0">
+        <xs:element name="booleanOption" type="tns:booleanOption"/>
+        <xs:element name="stringOption" type="tns:stringOption"/>
+        <xs:element name="intOption" type="tns:intOption"/>
+        <xs:element name="setOption" type="tns:setOption"/>
+        <xs:element name="enumOption" type="tns:enumeratedOption"/>
+        <xs:element name="fileOption" type="tns:fileOption"/>
+      </xs:choice>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType final="extension restriction" name="booleanOption">
+    <xs:complexContent>
+      <xs:extension base="tns:option">
+        <xs:sequence/>
+        <xs:attribute name="value" type="xs:boolean"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType abstract="true" name="option">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="alternative" type="tns:alternative"/>
+      <xs:element minOccurs="0" name="description" type="xs:string"/>
+      <xs:element minOccurs="0" name="documentation" type="xs:string"/>
+      <xs:element minOccurs="0" name="syntax" type="xs:string"/>
+    </xs:sequence>
+    <xs:attribute name="label" type="xs:string"/>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+    <xs:attribute name="userVisible" type="xs:boolean"/>
+  </xs:complexType>
+  <xs:complexType name="alternative">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="synopsis" type="xs:string"/>
+    </xs:sequence>
+    <xs:attribute name="name" type="xs:string"/>
+  </xs:complexType>
+  <xs:complexType name="stringOption">
+    <xs:complexContent>
+      <xs:extension base="tns:option">
+        <xs:sequence/>
+        <xs:attribute name="value" type="xs:string"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType final="extension restriction" name="intOption">
+    <xs:complexContent>
+      <xs:extension base="tns:option">
+        <xs:sequence/>
+        <xs:attribute name="value" type="xs:int"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType final="extension restriction" name="setOption">
+    <xs:complexContent>
+      <xs:extension base="tns:option">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="value" type="xs:string"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType final="extension restriction" name="enumeratedOption">
+    <xs:complexContent>
+      <xs:extension base="tns:option">
+        <xs:sequence/>
+        <xs:attribute name="value" type="xs:string"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="fileOption">
+    <xs:complexContent>
+      <xs:extension base="tns:stringOption">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="allowedFileExtension" type="xs:string"/>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="allowedFileExtensionName" type="xs:string"/>
+          <xs:element minOccurs="0" name="logicalType" type="xs:string"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="checker">
+    <xs:complexContent>
+      <xs:extension base="tns:optionable">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="warnings">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element maxOccurs="unbounded" minOccurs="0" name="warning" type="tns:juliaWarningMessage"/>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" name="synopsis" type="xs:string"/>
+        </xs:sequence>
+        <xs:attribute name="group" type="tns:checkersGroup"/>
+        <xs:attribute name="level" type="tns:visibilityLevel"/>
+        <xs:attribute name="name" type="xs:string"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="juliaWarningMessage">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="artifacts" type="xs:string"/>
+      <xs:element minOccurs="0" name="CWEid" type="xs:int"/>
+      <xs:element minOccurs="0" name="className" type="xs:string"/>
+      <xs:element minOccurs="0" name="externalClassifications">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element maxOccurs="unbounded" minOccurs="0" name="externalClassification" type="tns:externalClassification"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element minOccurs="0" name="fieldName" type="xs:string"/>
+      <xs:element name="line" type="xs:int"/>
+      <xs:element minOccurs="0" name="memberName" type="xs:string"/>
+      <xs:element minOccurs="0" name="note" type="xs:string"/>
+      <xs:element minOccurs="0" name="outputArtifacts">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element maxOccurs="unbounded" minOccurs="0" name="outputArtifact" type="xs:IDREF"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element minOccurs="0" name="simpleName" type="xs:string"/>
+      <xs:element minOccurs="0" name="source" type="xs:string"/>
+      <xs:element minOccurs="0" name="warningCWECategory" type="tns:juliaWarningMessageCWECategory"/>
+      <xs:element minOccurs="0" name="warningCategory" type="tns:juliaWarningMessageCategory"/>
+      <xs:element minOccurs="0" name="warningDescription" type="xs:string"/>
+      <xs:element minOccurs="0" name="warningMessage" type="xs:string"/>
+    </xs:sequence>
+    <xs:attribute name="kind" type="xs:string" use="required"/>
+    <xs:attribute name="progressive" type="xs:int" use="required"/>
+    <xs:attribute name="rank" type="xs:int" use="required"/>
+    <xs:attribute name="aboutAField" type="xs:boolean" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="externalClassification">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="description" type="xs:string"/>
+    </xs:sequence>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+    <xs:attribute name="weaknessId" type="xs:string" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="outputArtifact">
+    <xs:complexContent>
+      <xs:extension base="tns:artifact">
+        <xs:sequence/>
+        <xs:attribute name="producer" type="xs:string"/>
+        <xs:attribute name="standalone" type="xs:boolean" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="analysisReportResult">
+    <xs:complexContent>
+      <xs:extension base="tns:analysisResult">
+        <xs:sequence>
+          <xs:element name="analysisSpecification" type="tns:analysisSpecification"/>
+          <xs:element minOccurs="0" name="formattedRunDuration" type="xs:string"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="analysisResult">
+    <xs:sequence>
+      <xs:element name="id" type="xs:string"/>
+      <xs:element minOccurs="0" name="description" type="xs:string"/>
+      <xs:element name="status" type="tns:analysisStatus"/>
+      <xs:element name="creationTimestamp" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="engineVersion" type="xs:string"/>
+      <xs:element name="runDuration" type="xs:long"/>
+      <xs:element minOccurs="0" name="errorMessage" type="xs:string"/>
+      <xs:element minOccurs="0" name="errorStackTrace" type="xs:string"/>
+      <xs:element minOccurs="0" name="warnings">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element maxOccurs="unbounded" minOccurs="0" name="warning" type="tns:juliaWarningMessage"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element minOccurs="0" name="remarks">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element maxOccurs="unbounded" minOccurs="0" name="remark" type="tns:adaptedRemark"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="metrics">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element maxOccurs="unbounded" minOccurs="0" name="entry">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element minOccurs="0" name="key" type="xs:string"/>
+                  <xs:element minOccurs="0" name="value" type="xs:string"/>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element minOccurs="0" name="outputArtifacts">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element maxOccurs="unbounded" minOccurs="0" name="outputArtifact" type="tns:outputArtifact"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="adaptedRemark">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute name="tag" type="xs:string"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="solution">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="name" type="xs:string"/>
+      <xs:element name="solutionId" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="analysisCost">
+    <xs:sequence>
+      <xs:element name="costInLOC" type="xs:long"/>
+      <xs:element name="exceedingCredits" type="xs:boolean"/>
+      <xs:element minOccurs="0" name="message" type="xs:string"/>
+      <xs:element name="showMessage" type="xs:boolean"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="level">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="DEBUG"/>
+      <xs:enumeration value="INFO"/>
+      <xs:enumeration value="ERROR"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="analysisStatus">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="INIT"/>
+      <xs:enumeration value="PREPROCESSING"/>
+      <xs:enumeration value="SUBMITTED"/>
+      <xs:enumeration value="QUEUED"/>
+      <xs:enumeration value="INPROGRESS"/>
+      <xs:enumeration value="COMPLETED"/>
+      <xs:enumeration value="TIMEDOUT"/>
+      <xs:enumeration value="ERROR"/>
+      <xs:enumeration value="CANCELLED"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="packageType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Application"/>
+      <xs:enumeration value="Library"/>
+      <xs:enumeration value="Other"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="juliaWarningMessageCWECategory">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Improper_Input_Validation_and_Verification"/>
+      <xs:enumeration value="API_abuse"/>
+      <xs:enumeration value="Security_Features"/>
+      <xs:enumeration value="Time_and_State"/>
+      <xs:enumeration value="Error_Handling"/>
+      <xs:enumeration value="Code_Quality"/>
+      <xs:enumeration value="Encapsulation"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="juliaWarningMessageCategory">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="BUG"/>
+      <xs:enumeration value="EFFICIENCY"/>
+      <xs:enumeration value="STYLE"/>
+      <xs:enumeration value="UNCLASSIFIED"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="checkersGroup">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Basic"/>
+      <xs:enumeration value="Advanced"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="visibilityLevel">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Public"/>
+      <xs:enumeration value="Protected"/>
+      <xs:enumeration value="Private"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType final="#all" name="solutionArray">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="item" nillable="true" type="tns:solution"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType final="#all" name="analysisSpecificationBaseArray">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="item" nillable="true" type="tns:analysisSpecificationBase"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="JuliaWSException" nillable="true" type="tns:juliaWSExceptionBean"/>
+</xs:schema>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://jaxb.dev.java.net/array" version="1.0">
+
+  <xs:complexType final="#all" name="stringArray">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="item" nillable="true" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+</xs:schema>
+  </wsdl:types>
+  <wsdl:message name="getAnalysisConfigurationList">
+    <wsdl:part name="solutionId" type="xsd:int">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="registerAnalysisResponse">
+    <wsdl:part name="return" type="tns:analysisSpecification">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="retrieveAnalysisResult">
+    <wsdl:part name="analysisId" type="xsd:string">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="JuliaWSException">
+    <wsdl:part element="tns:JuliaWSException" name="JuliaWSException">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="downloadAnalysisArtifact">
+    <wsdl:part name="analysisId" type="xsd:string">
+    </wsdl:part>
+    <wsdl:part name="artifactKey" type="xsd:string">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getUserSolutionListResponse">
+    <wsdl:part name="return" type="tns:solutionArray">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getAnalysisStatusResponse">
+    <wsdl:part name="return" type="tns:analysisExtendedStatus">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="cancelAnalysis">
+    <wsdl:part name="analysisId" type="xsd:string">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getAnalysisSpecificationTemplate">
+  </wsdl:message>
+  <wsdl:message name="getJuliaVersion">
+  </wsdl:message>
+  <wsdl:message name="renameAnalysis">
+    <wsdl:part name="analysisId" type="xsd:string">
+    </wsdl:part>
+    <wsdl:part name="analysisName" type="xsd:string">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="computeAnalysisCostResponse">
+    <wsdl:part name="return" type="tns:analysisCost">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="renameAnalysisResponse">
+  </wsdl:message>
+  <wsdl:message name="computeAnalysisCost">
+    <wsdl:part name="analysisMetricsPreview" type="tns:analysisSpecification">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="downloadAnalysisArtifactResponse">
+    <wsdl:part name="return" type="xsd:base64Binary">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getJuliaVersionResponse">
+    <wsdl:part name="return" type="xsd:string">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="startAnalysisResponse">
+  </wsdl:message>
+  <wsdl:message name="getAnalysesList">
+    <wsdl:part name="solutionId" type="xsd:int">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getAnalysisConfigurationListResponse">
+    <wsdl:part name="return" type="ns1:stringArray">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="registerAnalysis">
+    <wsdl:part name="analysisSpecification" type="tns:analysisSpecification">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="uploadAnalysisArtifactResponse">
+  </wsdl:message>
+  <wsdl:message name="getAnalysisSpecificationTemplateResponse">
+    <wsdl:part name="return" type="tns:analysisSpecification">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="retrieveAnalysisResultResponse">
+    <wsdl:part name="return" type="tns:analysisReportResult">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getAnalysesListResponse">
+    <wsdl:part name="return" type="tns:analysisSpecificationBaseArray">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getAnalysisStatus">
+    <wsdl:part name="analysisId" type="xsd:string">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getAnalysisConfiguration">
+    <wsdl:part name="configurationName" type="xsd:string">
+    </wsdl:part>
+    <wsdl:part name="solutionId" type="xsd:int">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="uploadAnalysisArtifact">
+    <wsdl:part name="analysisId" type="xsd:string">
+    </wsdl:part>
+    <wsdl:part name="artifactKey" type="xsd:string">
+    </wsdl:part>
+    <wsdl:part name="content" type="xsd:base64Binary">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="cancelAnalysisResponse">
+    <wsdl:part name="return" type="xsd:boolean">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getAnalysisConfigurationResponse">
+    <wsdl:part name="return" type="tns:analysisSpecification">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="importAnalysis">
+    <wsdl:part name="analysisSpecification" type="tns:analysisReportResult">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="importAnalysisResponse">
+    <wsdl:part name="return" type="xsd:string">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="saveAnalysisConfiguration">
+    <wsdl:part name="solutionId" type="xsd:int">
+    </wsdl:part>
+    <wsdl:part name="configurationName" type="xsd:string">
+    </wsdl:part>
+    <wsdl:part name="arg2" type="tns:analysisSpecification">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="saveAnalysisConfigurationResponse">
+  </wsdl:message>
+  <wsdl:message name="getUserSolutionList">
+  </wsdl:message>
+  <wsdl:message name="startAnalysis">
+    <wsdl:part name="analysisId" type="xsd:string">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="IPluginService">
+    <wsdl:operation name="getAnalysisConfigurationList">
+      <wsdl:input message="tns:getAnalysisConfigurationList" name="getAnalysisConfigurationList">
+    </wsdl:input>
+      <wsdl:output message="tns:getAnalysisConfigurationListResponse" name="getAnalysisConfigurationListResponse">
+    </wsdl:output>
+      <wsdl:fault message="tns:JuliaWSException" name="JuliaWSException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="getAnalysisStatus">
+      <wsdl:input message="tns:getAnalysisStatus" name="getAnalysisStatus">
+    </wsdl:input>
+      <wsdl:output message="tns:getAnalysisStatusResponse" name="getAnalysisStatusResponse">
+    </wsdl:output>
+      <wsdl:fault message="tns:JuliaWSException" name="JuliaWSException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="getAnalysisConfiguration">
+      <wsdl:input message="tns:getAnalysisConfiguration" name="getAnalysisConfiguration">
+    </wsdl:input>
+      <wsdl:output message="tns:getAnalysisConfigurationResponse" name="getAnalysisConfigurationResponse">
+    </wsdl:output>
+      <wsdl:fault message="tns:JuliaWSException" name="JuliaWSException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="retrieveAnalysisResult">
+      <wsdl:input message="tns:retrieveAnalysisResult" name="retrieveAnalysisResult">
+    </wsdl:input>
+      <wsdl:output message="tns:retrieveAnalysisResultResponse" name="retrieveAnalysisResultResponse">
+    </wsdl:output>
+      <wsdl:fault message="tns:JuliaWSException" name="JuliaWSException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="uploadAnalysisArtifact">
+      <wsdl:input message="tns:uploadAnalysisArtifact" name="uploadAnalysisArtifact">
+    </wsdl:input>
+      <wsdl:output message="tns:uploadAnalysisArtifactResponse" name="uploadAnalysisArtifactResponse">
+    </wsdl:output>
+      <wsdl:fault message="tns:JuliaWSException" name="JuliaWSException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="downloadAnalysisArtifact">
+      <wsdl:input message="tns:downloadAnalysisArtifact" name="downloadAnalysisArtifact">
+    </wsdl:input>
+      <wsdl:output message="tns:downloadAnalysisArtifactResponse" name="downloadAnalysisArtifactResponse">
+    </wsdl:output>
+      <wsdl:fault message="tns:JuliaWSException" name="JuliaWSException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="cancelAnalysis">
+      <wsdl:input message="tns:cancelAnalysis" name="cancelAnalysis">
+    </wsdl:input>
+      <wsdl:output message="tns:cancelAnalysisResponse" name="cancelAnalysisResponse">
+    </wsdl:output>
+      <wsdl:fault message="tns:JuliaWSException" name="JuliaWSException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="getAnalysisSpecificationTemplate">
+      <wsdl:input message="tns:getAnalysisSpecificationTemplate" name="getAnalysisSpecificationTemplate">
+    </wsdl:input>
+      <wsdl:output message="tns:getAnalysisSpecificationTemplateResponse" name="getAnalysisSpecificationTemplateResponse">
+    </wsdl:output>
+      <wsdl:fault message="tns:JuliaWSException" name="JuliaWSException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="importAnalysis">
+      <wsdl:input message="tns:importAnalysis" name="importAnalysis">
+    </wsdl:input>
+      <wsdl:output message="tns:importAnalysisResponse" name="importAnalysisResponse">
+    </wsdl:output>
+      <wsdl:fault message="tns:JuliaWSException" name="JuliaWSException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="getJuliaVersion">
+      <wsdl:input message="tns:getJuliaVersion" name="getJuliaVersion">
+    </wsdl:input>
+      <wsdl:output message="tns:getJuliaVersionResponse" name="getJuliaVersionResponse">
+    </wsdl:output>
+      <wsdl:fault message="tns:JuliaWSException" name="JuliaWSException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="saveAnalysisConfiguration">
+      <wsdl:input message="tns:saveAnalysisConfiguration" name="saveAnalysisConfiguration">
+    </wsdl:input>
+      <wsdl:output message="tns:saveAnalysisConfigurationResponse" name="saveAnalysisConfigurationResponse">
+    </wsdl:output>
+      <wsdl:fault message="tns:JuliaWSException" name="JuliaWSException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="renameAnalysis">
+      <wsdl:input message="tns:renameAnalysis" name="renameAnalysis">
+    </wsdl:input>
+      <wsdl:output message="tns:renameAnalysisResponse" name="renameAnalysisResponse">
+    </wsdl:output>
+      <wsdl:fault message="tns:JuliaWSException" name="JuliaWSException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="getUserSolutionList">
+      <wsdl:input message="tns:getUserSolutionList" name="getUserSolutionList">
+    </wsdl:input>
+      <wsdl:output message="tns:getUserSolutionListResponse" name="getUserSolutionListResponse">
+    </wsdl:output>
+      <wsdl:fault message="tns:JuliaWSException" name="JuliaWSException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="startAnalysis">
+      <wsdl:input message="tns:startAnalysis" name="startAnalysis">
+    </wsdl:input>
+      <wsdl:output message="tns:startAnalysisResponse" name="startAnalysisResponse">
+    </wsdl:output>
+      <wsdl:fault message="tns:JuliaWSException" name="JuliaWSException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="computeAnalysisCost">
+      <wsdl:input message="tns:computeAnalysisCost" name="computeAnalysisCost">
+    </wsdl:input>
+      <wsdl:output message="tns:computeAnalysisCostResponse" name="computeAnalysisCostResponse">
+    </wsdl:output>
+      <wsdl:fault message="tns:JuliaWSException" name="JuliaWSException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="getAnalysesList">
+      <wsdl:input message="tns:getAnalysesList" name="getAnalysesList">
+    </wsdl:input>
+      <wsdl:output message="tns:getAnalysesListResponse" name="getAnalysesListResponse">
+    </wsdl:output>
+      <wsdl:fault message="tns:JuliaWSException" name="JuliaWSException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="registerAnalysis">
+      <wsdl:input message="tns:registerAnalysis" name="registerAnalysis">
+    </wsdl:input>
+      <wsdl:output message="tns:registerAnalysisResponse" name="registerAnalysisResponse">
+    </wsdl:output>
+      <wsdl:fault message="tns:JuliaWSException" name="JuliaWSException">
+    </wsdl:fault>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="PluginServiceSoapBinding" type="tns:IPluginService">
+    <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="getAnalysisConfigurationList">
+      <soap:operation soapAction="" style="rpc"/>
+      <wsdl:input name="getAnalysisConfigurationList">
+        <soap:body namespace="http://service.server.web.julia.juliasoft.com/" use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getAnalysisConfigurationListResponse">
+        <soap:body namespace="http://service.server.web.julia.juliasoft.com/" use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="JuliaWSException">
+        <soap:fault name="JuliaWSException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="getAnalysisStatus">
+      <soap:operation soapAction="" style="rpc"/>
+      <wsdl:input name="getAnalysisStatus">
+        <soap:body namespace="http://service.server.web.julia.juliasoft.com/" use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getAnalysisStatusResponse">
+        <soap:body namespace="http://service.server.web.julia.juliasoft.com/" use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="JuliaWSException">
+        <soap:fault name="JuliaWSException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="getAnalysisConfiguration">
+      <soap:operation soapAction="" style="rpc"/>
+      <wsdl:input name="getAnalysisConfiguration">
+        <soap:body namespace="http://service.server.web.julia.juliasoft.com/" use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getAnalysisConfigurationResponse">
+        <soap:body namespace="http://service.server.web.julia.juliasoft.com/" use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="JuliaWSException">
+        <soap:fault name="JuliaWSException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="retrieveAnalysisResult">
+      <soap:operation soapAction="" style="rpc"/>
+      <wsdl:input name="retrieveAnalysisResult">
+        <soap:body namespace="http://service.server.web.julia.juliasoft.com/" use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="retrieveAnalysisResultResponse">
+        <soap:body namespace="http://service.server.web.julia.juliasoft.com/" use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="JuliaWSException">
+        <soap:fault name="JuliaWSException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="uploadAnalysisArtifact">
+      <soap:operation soapAction="" style="rpc"/>
+      <wsdl:input name="uploadAnalysisArtifact">
+        <soap:body namespace="http://service.server.web.julia.juliasoft.com/" use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="uploadAnalysisArtifactResponse">
+        <soap:body namespace="http://service.server.web.julia.juliasoft.com/" use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="JuliaWSException">
+        <soap:fault name="JuliaWSException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="downloadAnalysisArtifact">
+      <soap:operation soapAction="" style="rpc"/>
+      <wsdl:input name="downloadAnalysisArtifact">
+        <soap:body namespace="http://service.server.web.julia.juliasoft.com/" use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="downloadAnalysisArtifactResponse">
+        <soap:body namespace="http://service.server.web.julia.juliasoft.com/" use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="JuliaWSException">
+        <soap:fault name="JuliaWSException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="cancelAnalysis">
+      <soap:operation soapAction="" style="rpc"/>
+      <wsdl:input name="cancelAnalysis">
+        <soap:body namespace="http://service.server.web.julia.juliasoft.com/" use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="cancelAnalysisResponse">
+        <soap:body namespace="http://service.server.web.julia.juliasoft.com/" use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="JuliaWSException">
+        <soap:fault name="JuliaWSException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="getAnalysisSpecificationTemplate">
+      <soap:operation soapAction="" style="rpc"/>
+      <wsdl:input name="getAnalysisSpecificationTemplate">
+        <soap:body namespace="http://service.server.web.julia.juliasoft.com/" use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getAnalysisSpecificationTemplateResponse">
+        <soap:body namespace="http://service.server.web.julia.juliasoft.com/" use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="JuliaWSException">
+        <soap:fault name="JuliaWSException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="importAnalysis">
+      <soap:operation soapAction="" style="rpc"/>
+      <wsdl:input name="importAnalysis">
+        <soap:body namespace="http://service.server.web.julia.juliasoft.com/" use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="importAnalysisResponse">
+        <soap:body namespace="http://service.server.web.julia.juliasoft.com/" use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="JuliaWSException">
+        <soap:fault name="JuliaWSException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="getJuliaVersion">
+      <soap:operation soapAction="" style="rpc"/>
+      <wsdl:input name="getJuliaVersion">
+        <soap:body namespace="http://service.server.web.julia.juliasoft.com/" use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getJuliaVersionResponse">
+        <soap:body namespace="http://service.server.web.julia.juliasoft.com/" use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="JuliaWSException">
+        <soap:fault name="JuliaWSException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="saveAnalysisConfiguration">
+      <soap:operation soapAction="" style="rpc"/>
+      <wsdl:input name="saveAnalysisConfiguration">
+        <soap:body namespace="http://service.server.web.julia.juliasoft.com/" use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="saveAnalysisConfigurationResponse">
+        <soap:body namespace="http://service.server.web.julia.juliasoft.com/" use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="JuliaWSException">
+        <soap:fault name="JuliaWSException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="renameAnalysis">
+      <soap:operation soapAction="" style="rpc"/>
+      <wsdl:input name="renameAnalysis">
+        <soap:body namespace="http://service.server.web.julia.juliasoft.com/" use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="renameAnalysisResponse">
+        <soap:body namespace="http://service.server.web.julia.juliasoft.com/" use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="JuliaWSException">
+        <soap:fault name="JuliaWSException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="getUserSolutionList">
+      <soap:operation soapAction="" style="rpc"/>
+      <wsdl:input name="getUserSolutionList">
+        <soap:body namespace="http://service.server.web.julia.juliasoft.com/" use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getUserSolutionListResponse">
+        <soap:body namespace="http://service.server.web.julia.juliasoft.com/" use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="JuliaWSException">
+        <soap:fault name="JuliaWSException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="startAnalysis">
+      <soap:operation soapAction="" style="rpc"/>
+      <wsdl:input name="startAnalysis">
+        <soap:body namespace="http://service.server.web.julia.juliasoft.com/" use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="startAnalysisResponse">
+        <soap:body namespace="http://service.server.web.julia.juliasoft.com/" use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="JuliaWSException">
+        <soap:fault name="JuliaWSException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="computeAnalysisCost">
+      <soap:operation soapAction="" style="rpc"/>
+      <wsdl:input name="computeAnalysisCost">
+        <soap:body namespace="http://service.server.web.julia.juliasoft.com/" use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="computeAnalysisCostResponse">
+        <soap:body namespace="http://service.server.web.julia.juliasoft.com/" use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="JuliaWSException">
+        <soap:fault name="JuliaWSException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="getAnalysesList">
+      <soap:operation soapAction="" style="rpc"/>
+      <wsdl:input name="getAnalysesList">
+        <soap:body namespace="http://service.server.web.julia.juliasoft.com/" use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getAnalysesListResponse">
+        <soap:body namespace="http://service.server.web.julia.juliasoft.com/" use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="JuliaWSException">
+        <soap:fault name="JuliaWSException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="registerAnalysis">
+      <soap:operation soapAction="" style="rpc"/>
+      <wsdl:input name="registerAnalysis">
+        <soap:body namespace="http://service.server.web.julia.juliasoft.com/" use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="registerAnalysisResponse">
+        <soap:body namespace="http://service.server.web.julia.juliasoft.com/" use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="JuliaWSException">
+        <soap:fault name="JuliaWSException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="PluginService">
+    <wsdl:port binding="tns:PluginServiceSoapBinding" name="PluginServicePort">
+      <soap:address location="https://portal.juliasoft.com/services/PluginService"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>
